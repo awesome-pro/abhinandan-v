@@ -79,13 +79,16 @@ function GetPatient() {
             const response = await axios.get('/api/patient')
             if(response.status == 200){
                 setPatientList(response.data)
+                toast.success('Patients Found')
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 setError(error.message)
+                
             } else {
                 setError('An unexpected error occurred')
             }
+            toast.error('Patients not found')
             console.error(error)
         }finally{
             setLoading(false)

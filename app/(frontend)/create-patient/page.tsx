@@ -4,6 +4,7 @@ import React from 'react'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import axios from 'axios'
+import confetti from "canvas-confetti";
 
 import {
     Card,
@@ -29,11 +30,14 @@ import { patientFormSchema } from '@/schema/patient-form-schema'
 import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { Patient } from '@prisma/client'
+import Link from 'next/link'
 
 function CreatePatient() {
 
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
+    const [patient, setPatient] = React.useState<Patient | null>(null)
 
 
     const form = useForm({
@@ -46,6 +50,37 @@ function CreatePatient() {
             address: "",
         }
     })
+
+    const handleConfetti = () => {
+        const end = Date.now() + 3 * 1000; // 3 seconds
+        const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"];
+     
+        const frame = () => {
+          if (Date.now() > end) return;
+     
+          confetti({
+            particleCount: 2,
+            angle: 60,
+            spread: 55,
+            startVelocity: 60,
+            origin: { x: 0, y: 0.5 },
+            colors: colors,
+          });
+          confetti({
+            particleCount: 2,
+            angle: 120,
+            spread: 55,
+            startVelocity: 60,
+            origin: { x: 1, y: 0.5 },
+            colors: colors,
+          });
+     
+          requestAnimationFrame(frame);
+        };
+     
+        frame();
+      };
+     
 
     async function onSubmit(values: z.infer<typeof patientFormSchema>) {
         setLoading(true)
@@ -63,6 +98,8 @@ function CreatePatient() {
                         }
                     }
                 })
+
+                handleConfetti();
                 
                 form.reset()
             }
@@ -179,6 +216,8 @@ function CreatePatient() {
             <CardFooter>
                 {loading && <p className='text-primary text-3xl font-semibold animate-pulse'>Loading... </p>}
                 {error && <p className='text-red-500'>{error}</p>}
+
+                {patient && <Link href={`/patient/${patient.id}`} className='text-primary/70 hover:text-primary'>View Patient Details</Link>}
             </CardFooter>
         </Card>
     </section>
