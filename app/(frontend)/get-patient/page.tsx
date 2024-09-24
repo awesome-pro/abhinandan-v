@@ -28,6 +28,7 @@ import axios from 'axios'
 import * as z from 'zod'
 import { toast } from 'sonner'
 import { Label } from '@/components/ui/label'
+import { Patient } from '@prisma/client'
 
 
 const selectOptions = [
