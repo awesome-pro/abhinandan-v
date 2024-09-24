@@ -28,6 +28,8 @@ import { useForm } from "react-hook-form"
 import axios from 'axios'
 import * as z from 'zod'
 import { toast } from 'sonner'
+import { Label } from '@/components/ui/label'
+import Link from 'next/link'
 
 
 const selectOptions = [
@@ -50,9 +52,11 @@ const formSchema = z.object({
     path: ["name", "email", "phone", "age", "address"],
 })
 
+
 function GetPatient() {
     const [selectedField, setSelectedField] = React.useState<'name' | 'email' | 'phone' | 'age' | 'address'>('name');
     const [patient, setPatient] = React.useState<Patient | null>(null);
+    const [patientList, setPatientList] = React.useState<Patient[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 
@@ -68,32 +72,32 @@ function GetPatient() {
         }
     })
 
+
+    const getPatients = async () => {
+        setLoading(true)
+        try {
+            const response = await axios.get('/api/patient')
+            if(response.status == 200){
+                setPatientList(response.data)
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                setError(error.message)
+            } else {
+                setError('An unexpected error occurred')
+            }
+            console.error(error)
+        }finally{
+            setLoading(false)
+        }
+    }
+
   return (
-    <section className='w-screen min-h-screen flex flex-col items-center justify-center'>
-        <Card className="">
-            <CardHeader>
-                <CardTitle>Patient Details</CardTitle>
+    <section className='w-screen min-h-screen flex flex-col items-center justify-center px-3 h-full'>
+        <Card className="w-full lg:max-w-[500px] h-full">
+            <CardHeader className='mb-5'>
+                <CardTitle className='text-3xl text-primary font-semibold'>Get Patient Details</CardTitle>
                 <CardDescription>Enter the details to get a Patient</CardDescription>
-                <Select onValueChange={
-                    (value) => {
-                        setSelectedField(value as 'name' | 'email' | 'phone' | 'age' | 'address')
-                    }
-                }
-                 value={selectedField}
-                >
-                    <SelectTrigger>
-                        <SelectValue>{selectedField}</SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            {selectOptions.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </SelectItem>
-                            ))}
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
             </CardHeader>
             <CardContent className='w-full'>
                 
@@ -135,12 +139,36 @@ function GetPatient() {
                             </FormItem>
                         )}
                     />
+
+                    <Label className='mt-4 text-primary'>Select any one of the field</Label>
+                    <Select onValueChange={
+                        (value) => {
+                            setSelectedField(value as 'name' | 'email' | 'phone' | 'age' | 'address')
+                        }
+                    }
+                    value={selectedField}
+                    >
+                       
+                        <SelectTrigger>
+                            <SelectValue>{selectedField}</SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                {selectOptions.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+
                     <FormField
                         control={form.control}
                         name={selectedField}
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>{selectedField.toUpperCase()}</FormLabel>
+                                <FormLabel className='mt-5'>{selectedField.toUpperCase()}</FormLabel>
                                 <FormControl>
                                     <Input disabled={loading} placeholder={selectedField} {...field} />
                                 </FormControl>
@@ -151,24 +179,77 @@ function GetPatient() {
                             </FormItem>
                         )}
                     />
-                    <Button type='submit' className='w-full' disabled={loading}>Get Patient</Button>
+                   <div className='w-full mt-10 flex items-center justify-center gap-5'>
+                        <Button 
+                            type='reset' 
+                            className='w-full text-primary' 
+                            disabled={loading} 
+                            variant={'ghost'}
+                            onClick={() => {
+                                getPatients();
+                            }}
+                            >
+                                Get All Patients
+                            </Button>
+                        <Button type='submit' className='w-full' disabled={loading}>Get Patient</Button>   
+                   </div>
                 </form>
                 </Form>
             </CardContent>
-
-            <CardFooter>
-                {patient && (
-                    <div className="p-4 border rounded-md shadow-md">
-                        <p><strong>ID:</strong> {patient.id}</p>
-                        <p><strong>Name:</strong> {patient.name}</p>
-                        <p><strong>Email:</strong> {patient.email}</p>
-                        <p><strong>Phone:</strong> {patient.phone}</p>
-                        <p><strong>Age:</strong> {patient.age}</p>
-                        <p><strong>Address:</strong> {patient.address}</p>
-                    </div>
-                )}
+            <CardFooter className='w-full flex items-center justify-center '>
+                {error && <p className='text-destructive'>{error}</p>}
+                {loading && <p className='text-primary text-2xl font-semibold animate-pulse'>Loading...</p>}
             </CardFooter>
         </Card>
+       {
+        patient && (
+            <Card className="w-full lg:max-w-[1000px] mt-5 ">
+                <CardHeader className='w-full bg-primary/10'>
+                    <CardTitle className='text-3xl text-primary font-semibold w-full'>Patient Details</CardTitle>
+                    <CardDescription>Details of the patient</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className='flex flex-col gap-3'>
+                        <p><span className='font-semibold'>ID:</span> {patient.id}</p>
+                        <p><span className='font-semibold'>Name:</span> {patient.name}</p>
+                        <p><span className='font-semibold'>Email:</span> {patient.email}</p>
+                        <p><span className='font-semibold'>Phone:</span> {patient.phone}</p>
+                        <p><span className='font-semibold'>Age:</span> {patient.age}</p>
+                        <p><span className='font-semibold'>Address:</span> {patient.address}</p>
+                    </div>
+                </CardContent>
+            </Card>
+        )
+       }
+       {
+            patientList.length > 0 && (
+                <div className='w-full flex  flex-col items-center justify-center '>
+                    <div className='w-full bg-primary/20 text-primary text-center text-3xl py-10'>
+                        <h1 className='text-2xl text-primary font-semibold'>All Patients</h1>
+                    </div>
+                    {
+                        patientList.map((patient) => (
+                        <Card key={patient.id} className="w-full lg:max-w-[1000px] mt-5 ">
+                            <CardHeader className='w-full'>
+                                <CardTitle className='text-3xl text-primary font-semibold'>Patient Details</CardTitle>
+                                <CardDescription>Details of the patient</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className='flex flex-col lg:grid lg:grid-cols-3 gap-3'>
+                                    <p><span className='font-semibold'>ID:</span> {patient.id}</p>
+                                    <p><span className='font-semibold'>Name:</span> {patient.name}</p>
+                                    <p><span className='font-semibold'>Email:</span> {patient.email}</p>
+                                    <p><span className='font-semibold'>Phone:</span> {patient.phone}</p>
+                                    <p><span className='font-semibold'>Age:</span> {patient.age}</p>
+                                    <p><span className='font-semibold'>Address:</span> {patient.address}</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))
+                }
+                </div>
+            )
+       }
     </section>
   )
 }

@@ -81,8 +81,8 @@ function CreatePatient() {
   return (
     <section className='w-screen min-h-screen flex flex-col items-center justify-center gap-20 px-3'>
         <Card className='w-full lg:max-w-[800px]'>
-            <CardHeader>
-                <CardTitle className='text-4xl font-semibold text-primary'>Patient Form</CardTitle>
+            <CardHeader className='bg-primary/10'>
+                <CardTitle className='text-3xl font-semibold text-primary'>Patient Form</CardTitle>
                 <CardDescription>Enter the details to create a Patient</CardDescription>
             </CardHeader>
             <CardContent className='w-full'>
@@ -169,13 +169,15 @@ function CreatePatient() {
                         )}
                         />
 
-                        <div className='flex items-center justify-center'>
+                        <div className='flex items-center justify-center w-full mt-9 lg:mt-20 gap-4'>
+                            <Button variant='ghost' className='w-full' type='reset'>Cancel</Button>
                             <Button type="submit" disabled={loading} className='w-full '>Submit</Button>
                         </div>
                     </form>
                 </Form>
             </CardContent>
             <CardFooter>
+                {loading && <p className='text-primary text-3xl font-semibold animate-pulse'>Loading... </p>}
                 {error && <p className='text-red-500'>{error}</p>}
             </CardFooter>
         </Card>
