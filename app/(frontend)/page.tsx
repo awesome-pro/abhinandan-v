@@ -12,7 +12,7 @@ export default function Home() {
         Welcome to Patient AI
       </h1>
         <div className="w-full flex items-center justify-center gap-10">
-            <Link href="/create">
+            <Link href="/create-patient">
               <Button>
                 Create Patient 
               </Button>
