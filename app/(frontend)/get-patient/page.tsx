@@ -22,14 +22,12 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
-import { Patient } from '@prisma/client';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import axios from 'axios'
 import * as z from 'zod'
 import { toast } from 'sonner'
 import { Label } from '@/components/ui/label'
-import Link from 'next/link'
 
 
 const selectOptions = [
