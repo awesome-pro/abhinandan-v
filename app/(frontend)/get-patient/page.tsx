@@ -63,7 +63,7 @@ function GetPatient() {
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            id: 0,
+            id: 1,
             name: "",
             email: "",
             phone: "",
@@ -74,6 +74,7 @@ function GetPatient() {
 
 
     const getPatients = async () => {
+        setPatient(null)
         setLoading(true)
         try {
             const response = await axios.get('/api/patient')
@@ -93,7 +94,7 @@ function GetPatient() {
     }
 
   return (
-    <section className='w-screen min-h-screen flex flex-col items-center justify-center px-3 h-full'>
+    <section className='relative w-screen min-h-screen flex flex-col items-center justify-center px-3 h-full py-16'>
         <Card className="w-full lg:max-w-[500px] h-full">
             <CardHeader className='mb-5'>
                 <CardTitle className='text-3xl text-primary font-semibold'>Get Patient Details</CardTitle>
@@ -104,6 +105,7 @@ function GetPatient() {
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(async (values) => {
                     setLoading(true)
+                    setPatientList([])
                     try {
                         console.log(values)
                         const response = await axios.get(`/api/patient?id=${values.id}&${selectedField}=${values[selectedField]}`)
@@ -250,6 +252,10 @@ function GetPatient() {
                 </div>
             )
        }
+
+       <p className='text-sm text-primary/80 absolute bottom-3'>
+         Thanks for using Patient AI
+       </p>
     </section>
   )
 }
