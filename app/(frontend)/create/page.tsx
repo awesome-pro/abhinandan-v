@@ -54,6 +54,16 @@ function CreatePatient() {
             const response = await axios.post('/api/patient', values)
             if(response.status == 200){
                 toast.success('Patient created successfully')
+                toast('Patient created successfully', {
+                    description: 'Patient has been created successfully',
+                    action: {
+                        label: 'View Patient',
+                        onClick: () => {
+                            console.log('Viewing patient')
+                        }
+                    }
+                })
+                
                 form.reset()
             }
         } catch (error) {
@@ -62,17 +72,17 @@ function CreatePatient() {
             } else {
                 setError('An unexpected error occurred')
             }
-            toast.error(error?.message as string)
+            toast.error('An unexpected error occurred')
             console.error(error)
         }finally{
             setLoading(false)
         }
     }
   return (
-    <section className='w-screen min-h-screen flex flex-col items-center justify-center gap-20'>
-        <Card className='w-full'>
+    <section className='w-screen min-h-screen flex flex-col items-center justify-center gap-20 px-3'>
+        <Card className='w-full lg:max-w-[800px]'>
             <CardHeader>
-                <CardTitle>Patient Form</CardTitle>
+                <CardTitle className='text-4xl font-semibold text-primary'>Patient Form</CardTitle>
                 <CardDescription>Enter the details to create a Patient</CardDescription>
             </CardHeader>
             <CardContent className='w-full'>
@@ -159,7 +169,9 @@ function CreatePatient() {
                         )}
                         />
 
-                        <Button type="submit" disabled={loading}>Submit</Button>
+                        <div className='flex items-center justify-center'>
+                            <Button type="submit" disabled={loading} className='w-full '>Submit</Button>
+                        </div>
                     </form>
                 </Form>
             </CardContent>
@@ -167,7 +179,6 @@ function CreatePatient() {
                 {error && <p className='text-red-500'>{error}</p>}
             </CardFooter>
         </Card>
-
     </section>
   )
 }

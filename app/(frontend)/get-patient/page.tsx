@@ -101,13 +101,12 @@ function GetPatient() {
                 <form onSubmit={form.handleSubmit(async (values) => {
                     setLoading(true)
                     try {
-                        const response = await axios.get(`/api/patient/${values.id}?${selectedField}=${values[selectedField]}`)
+                        console.log(values)
+                        const response = await axios.get(`/api/patient?id=${values.id}&${selectedField}=${values[selectedField]}`)
                         if(response.status == 200){
                             toast.success('Patient Found')
                             setPatient(response.data)
                         }
-
-
                     } catch (error) {
                         if (axios.isAxiosError(error)) {
                             setError(error.message)

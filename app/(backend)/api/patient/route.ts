@@ -12,26 +12,32 @@ export async function GET(request: NextRequest) {
   const age = searchParams.get('age');
   const address = searchParams.get('address');
 
-  let intID = id ? parseInt(id) : NaN;
-  console.log(intID);
+  console.log(id, name, email, phone, age, address);
 
-  // ensure that the query parameters must contain id and one of the following: name, email, phone, age, address
-  // if (!id || !(name || email || phone || age || address)) {
-  //   return NextResponse.json({ error: 'Invalid query parameters' }, { status: 400 });
-  // }
+  try {
 
+    if(id && id !== '') {
+      const patient = await prisma.patient.findUnique({
+        where: {
+          id: Number(id)
+        }
+      });
 
-  const patient = await prisma.patient.findFirst({
-    where: {
-      id: intID,
+      if (patient) {
+        return NextResponse.json(patient, { status: 200 });
+      }
+    }else{
+      // return all patients  
+      const patients = await prisma.patient.findMany();
+      return NextResponse.json(patients, { status: 200 });
+      
     }
-  });
-
-  if (!patient) {
+    
+  } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: 'Patient not found' }, { status: 404 });
   }
-
-  return NextResponse.json(patient);
+  return NextResponse.json({ message: 'Patient Not found' }, { status: 404 });
 }
 
 export async function POST(request: NextRequest) {
@@ -48,7 +54,18 @@ export async function POST(request: NextRequest) {
 
   try {
   
-    
+    const patient = await prisma.patient.create({
+      data: {
+        name: name,
+        email: email,
+        phone: phone,
+        age: Number(age),
+        address: address
+      }
+    })
+
+    return NextResponse.json(patient, { status: 201 });
+
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Patient not created' }, { status: 404 });
