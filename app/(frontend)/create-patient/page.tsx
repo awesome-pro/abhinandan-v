@@ -32,6 +32,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { Patient } from '@prisma/client'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 function CreatePatient() {
 
@@ -39,6 +40,7 @@ function CreatePatient() {
     const [error, setError] = React.useState<string | null>(null);
     const [patient, setPatient] = React.useState<Patient | null>(null)
 
+    const router = useRouter();
 
     const form = useForm({
         resolver: zodResolver(patientFormSchema),
@@ -87,21 +89,12 @@ function CreatePatient() {
         try {
             console.log(values)
             const response = await axios.post('/api/patient', values)
-            if(response.status == 200){
-                toast.success('Patient created successfully')
-                toast('Patient created successfully', {
-                    description: 'Patient has been created successfully',
-                    action: {
-                        label: 'View Patient',
-                        onClick: () => {
-                            console.log('Viewing patient')
-                        }
-                    }
-                })
-
+            if(response.status == 200 || response.status == 201){
+                toast.success('Redirecting to patient details page')
                 handleConfetti();
-                
                 form.reset()
+                setPatient(response.data)
+                //router.push(`/get-patient/${response.data.id}`)
             }
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
@@ -217,7 +210,9 @@ function CreatePatient() {
                 {loading && <p className='text-primary text-3xl font-semibold animate-pulse'>Loading... </p>}
                 {error && <p className='text-red-500'>{error}</p>}
 
-                {patient && <Link href={`/patient/${patient.id}`} className='text-primary/70 hover:text-primary'>View Patient Details</Link>}
+                {patient && <Link href={`/patient/${patient.id}`} className='text-primary/70 hover:text-primary'>
+                    <Button variant='link' className='w-full'>View Patient Details</Button>
+                </Link>}
             </CardFooter>
         </Card>
     </section>

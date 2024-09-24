@@ -12,7 +12,7 @@ function GetPatient() {
 
     const params = useParams();
     const { id } = params;
-
+    
     const [patient, setPatient] = React.useState<Patient | null>(null);
     const [error, setError] = React.useState<string | null>(null);
     const [loading, setLoading] = React.useState(false);
